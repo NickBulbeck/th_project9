@@ -1,7 +1,7 @@
 {
   "name": "techdegree-fullstackjs-rest-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Nick's Unit 9 Project",
   "main": "app.js",
   "scripts": {
     "start": "nodemon ./app.js",
@@ -19,6 +19,8 @@
     "express": "^4.17.1",
     "morgan": "^1.10.0",
     "promise.prototype.finally": "^3.1.2",
+    "sequelize": "^6.13.0",
+    "sequelize-cli": "^6.3.0",
     "sqlite3": "^5.0.0"
   }
 }

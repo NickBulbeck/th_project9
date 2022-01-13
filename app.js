@@ -13,6 +13,12 @@ const app = express();
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
+// Connection test:
+// const testConnection = require('.')
+
+
+
+
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
   res.json({

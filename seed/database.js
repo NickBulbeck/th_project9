@@ -8,7 +8,7 @@ class Database {
     this.courses = seedData.courses;
     this.users = seedData.users;
     this.enableLogging = enableLogging;
-    this.context = new Context('fsjstd-restapi.db', enableLogging);
+    this.context = new Context('./data/fsjstd-restapi.db', enableLogging);
   }
 
   log(message) {

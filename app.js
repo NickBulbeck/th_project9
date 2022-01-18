@@ -14,7 +14,8 @@ const app = express();
 app.use(morgan('dev'));
 
 // Connection test:
-// const testConnection = require('.')
+const testConnection = require('./scripts/authenticate.js').testConnection;
+testConnection();
 
 
 

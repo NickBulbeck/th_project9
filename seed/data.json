@@ -1,16 +1,25 @@
 {
   "users": [
     {
+      "firstName": "Nick",
+      "lastName": "Bulbeck",
+      "emailAddress": "nick@treehouse.com",
+      "password": "nickpassword",
+      "role": "admin"
+    },
+    {
       "firstName": "Joe",
       "lastName": "Smith",
       "emailAddress": "joe@smith.com",
-      "password": "joepassword"
+      "password": "joepassword",
+      "role": "standard"
     },
     {
       "firstName": "Sally",
       "lastName": "Jones",
       "emailAddress": "sally@jones.com",
-      "password": "sallypassword"
+      "password": "sallypassword",
+      "role": "standard"
     }
   ],
   "courses": [

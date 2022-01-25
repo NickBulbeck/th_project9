@@ -10,7 +10,7 @@ const testConnection = async () => {
   }
 // synchronise:
   try {
-    sequelize.sync({force:true});
+    sequelize.sync({force:false});
     console.log("sync() performed successfully");
   } catch(error) {
     console.log(`Synchronisation failed: ${error.status}, ${error.message}`);

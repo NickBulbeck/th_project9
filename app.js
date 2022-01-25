@@ -12,13 +12,9 @@ const app = express();
 
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
-
+app.use(express.json());
 // Connection test:
-const testConnection = require('./scripts/authenticate.js').testConnection;
-testConnection();
-
-
-
+const testConnection = require('./scripts/authenticateDB.js').testConnection();
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
@@ -26,6 +22,10 @@ app.get('/', (req, res) => {
     message: 'Welcome to the REST API project!',
   });
 });
+
+// You know, the actual stuff
+const apiRouter = require('./routes/apiRoutes.js');
+app.use('/api',apiRouter);
 
 // send 404 if no other route matched
 app.use((req, res) => {

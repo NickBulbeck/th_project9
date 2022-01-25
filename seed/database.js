@@ -34,14 +34,15 @@ class Database {
     return this.context
       .execute(`
         INSERT INTO Users
-          (firstName, lastName, emailAddress, password, createdAt, updatedAt)
+          (firstName, lastName, emailAddress, password, role, createdAt, updatedAt)
         VALUES
-          (?, ?, ?, ?, datetime('now'), datetime('now'));
+          (?, ?, ?, ?, ?, datetime('now'), datetime('now'));
       `,
       user.firstName,
       user.lastName,
       user.emailAddress,
-      user.password);
+      user.password,
+      user.role);
   }
 
   createCourse(course) {
@@ -102,6 +103,7 @@ class Database {
         lastName VARCHAR(255) NOT NULL DEFAULT '', 
         emailAddress VARCHAR(255) NOT NULL DEFAULT '' UNIQUE, 
         password VARCHAR(255) NOT NULL DEFAULT '', 
+        role VARCHAR(255) NOT NULL DEFAULT '',
         createdAt DATETIME NOT NULL, 
         updatedAt DATETIME NOT NULL
       );

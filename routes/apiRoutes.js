@@ -11,9 +11,7 @@ const adminUserAuth = require('../scripts/authenticateUser').adminUserAuth;
 // User routes:
 //***********************************************************************
 router.get('/users', standardUserAuth, asyncHandler(async (req,res,next) => {
-  // // const users = require('../models').Users;
-  // //test: refactor this out once the authorisation is in place
-  // req.user = {};
+// Returns current authorised user, whether they are standard or admin
   if (req.currentUser) {
     console.log(req.currentUser);
   }
@@ -21,7 +19,7 @@ router.get('/users', standardUserAuth, asyncHandler(async (req,res,next) => {
 }));
 
 router.get('/users/all', asyncHandler(async (req,res,next) => {
-  // authorise this for admin users only
+// Returns all users; can only be used by admin users
   const users = require('../models').Users;
   const allUsers = {};
   allUsers.users = await users.findAll({
@@ -36,18 +34,22 @@ router.get('/users/all', asyncHandler(async (req,res,next) => {
 }));
 
 router.post('/users', asyncHandler(async (req,res,next) => {
+// creates a new user; no authorisation needed
   // mind and return a 400 status for a SequelizeUniqueConstraintError
   // also return a 201 status and nae content
 }));
 
 router.put('/users', asyncHandler(async (req,res,next) => {
+// updates the current authorised user, whether standard or admin
   // current authorised user only; returns 204 status with no content
 }));
+
 router.put('/users/:id', asyncHandler(async (req,res,next) => {
+// updates the user with the given id. Admin users only  
   // admin users only; returns 204 status with no content
 }))
 
-router.delete('/users', asyncHandler(async (res,req,next) => {
+router.delete('/users/:id', asyncHandler(async (res,req,next) => {
 // admin users only. Mind and add the "tbd" user to a' the relevant courses too.
 // returns 204 status with no content
 }));
@@ -57,7 +59,7 @@ router.delete('/users', asyncHandler(async (res,req,next) => {
 //***********************************************************************
 
 router.get('/courses', asyncHandler(async (req,res,next) => {
-  // gets them a'. Returns 200 status.
+  // gets them a'. Returns 200 status. No authorisation needed.
 }));
 
 router.get('/courses/:id', asyncHandler(async (req,res,next) => {
@@ -66,6 +68,7 @@ router.get('/courses/:id', asyncHandler(async (req,res,next) => {
 
 router.post('/courses', asyncHandler(async (req,res,next) => {
   // inclined to make this admin only, but that't not in the spec
+  // Except the user will be the current authorised, and we'll need one for an admin user
   // Returns 201 status.
 }));
 

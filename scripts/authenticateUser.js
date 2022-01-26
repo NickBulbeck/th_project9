@@ -18,7 +18,6 @@ const standard = async (req,res,next) => {
       }
     });
     if (user) {
-      console.log(`Username: ${user.emailAddress}, password: ${credentials.pass}`);
       const authenticated = bcrypt
         .compareSync(credentials.pass, user.password);
       if (authenticated) {
@@ -26,7 +25,7 @@ const standard = async (req,res,next) => {
         delete user.dataValues.password; // NOW we can horse the password.
         req.currentUser = user.dataValues;
       } else {
-        message = `Authentication successful for ${user.emailAddress}`;
+        message = `Authentication failed for ${user.emailAddress}`;
       }
     } else {
       message = `User not found for ${credentials.name}`;

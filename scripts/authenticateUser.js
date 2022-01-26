@@ -23,7 +23,7 @@ const standard = async (req,res,next) => {
         .compareSync(credentials.pass, user.password);
       if (authenticated) {
         console.log(`Authentication successful for ${user.emailAddress}`);
-        delete user.dataValues.password; // NOW we can horse the password
+        delete user.dataValues.password; // NOW we can horse the password.
         req.currentUser = user.dataValues;
       } else {
         message = `Authentication successful for ${user.emailAddress}`;
@@ -42,6 +42,8 @@ const standard = async (req,res,next) => {
     next();
   }
 }
+
+
 
 const admin = async (req,res,next) => {
 

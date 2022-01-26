@@ -2,28 +2,22 @@ const express = require('express');
 const router = express.Router();
 
 const asyncHandler = require('../scripts/asyncHandler.js').asyncHandler;
+const users = require('../models').Users;
+const courses = require('../models').Courses;
+const standardUserAuth = require('../scripts/authenticateUser').standardUserAuth;
+const adminUserAuth = require('../scripts/authenticateUser').adminUserAuth;
+
 //***********************************************************************
 // User routes:
 //***********************************************************************
-router.get('/users', asyncHandler(async (req,res,next) => {
-  const users = require('../models').Users;
-  //test: refactor this out once the authorisation is in place
-  req.user = {};
-  req.user.emailAddress = "nick@treehouse.com";
-  // endTest
-  const searchTerm = req.user.emailAddress;
-  const user = await users.findAll({
-    where: {
-      emailAddress: searchTerm
-    },
-    attributes: {
-      exclude:  [ "password",
-                  "createdAt",
-                  "updatedAt"
-                ]
-    }
-  });
-  res.status(200).json(user);
+router.get('/users', standardUserAuth, asyncHandler(async (req,res,next) => {
+  // // const users = require('../models').Users;
+  // //test: refactor this out once the authorisation is in place
+  // req.user = {};
+  if (req.currentUser) {
+    console.log(req.currentUser);
+  }
+  res.status(200).json(req.currentUser);
 }));
 
 router.get('/users/all', asyncHandler(async (req,res,next) => {

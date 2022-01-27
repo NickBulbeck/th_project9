@@ -97,3 +97,5 @@ app.get("/", setMyInfo("Test-123"), (req, res) => {
 });
 
 */
+
+module.exports = router;

@@ -4,13 +4,13 @@ const router = express.Router();
 const asyncHandler = require('../scripts/asyncHandler.js').asyncHandler;
 const users = require('../models').Users;
 const courses = require('../models').Courses;
-const standardUserAuth = require('../scripts/authenticateUser').standardUserAuth;
-const adminUserAuth = require('../scripts/authenticateUser').adminUserAuth;
+// const authenticateUserBackup = require('../scripts/authenticateUserBackup').standardUserAuth;
+const authenticateUser = require('../scripts/authenticateUser').authenticateUser;
 
 //***********************************************************************
 // User routes:
 //***********************************************************************
-router.get('/users', standardUserAuth, asyncHandler(async (req,res,next) => {
+router.get('/users', authenticateUser(false), asyncHandler(async (req,res,next) => {
 // Returns current authorised user, whether they are standard or admin
   if (req.currentUser) {
     console.log(req.currentUser);
@@ -18,7 +18,7 @@ router.get('/users', standardUserAuth, asyncHandler(async (req,res,next) => {
   res.status(200).json(req.currentUser);
 }));
 
-router.get('/users/all', asyncHandler(async (req,res,next) => {
+router.get('/users/all', authenticateUser(true), asyncHandler(async (req,res,next) => {
 // Returns all users; can only be used by admin users
   const users = require('../models').Users;
   const allUsers = {};
@@ -39,17 +39,17 @@ router.post('/users', asyncHandler(async (req,res,next) => {
   // also return a 201 status and nae content
 }));
 
-router.put('/users', asyncHandler(async (req,res,next) => {
+router.put('/users', authenticateUser(false), asyncHandler(async (req,res,next) => {
 // updates the current authorised user, whether standard or admin
   // current authorised user only; returns 204 status with no content
 }));
 
-router.put('/users/:id', asyncHandler(async (req,res,next) => {
+router.put('/users/:id', authenticateUser(true), asyncHandler(async (req,res,next) => {
 // updates the user with the given id. Admin users only  
   // admin users only; returns 204 status with no content
 }))
 
-router.delete('/users/:id', asyncHandler(async (res,req,next) => {
+router.delete('/users/:id', authenticateUser(true), asyncHandler(async (res,req,next) => {
 // admin users only. Mind and add the "tbd" user to a' the relevant courses too.
 // returns 204 status with no content
 }));
@@ -84,18 +84,17 @@ router.delete('/courses/:id', asyncHandler(async (req,res,next) => {
 
 
 
-/*
-const setMyInfo = (text) => {
-  return (req, res, next) => {
-    req.myInfo = text;
-    next();
-  };
-};
 
-app.get("/", setMyInfo("Test-123"), (req, res) => {
-  res.send("Hi there! myInfo = " + req.myInfo);
-});
+// const setMyInfo = (text) => {
+//   return (req, res, next) => {
+//     req.myInfo = text;
+//     next();
+//   };
+// };
 
-*/
+router.get('/adminTest', authenticateUser(true), asyncHandler(async (req,res,next) => {
+  res.status(200).json(req.currentUser);
+}));
+
 
 module.exports = router;

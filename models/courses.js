@@ -14,10 +14,42 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Courses.init({
-    title: DataTypes.STRING,
-    description: DataTypes.TEXT,
-    estimatedTime: DataTypes.STRING,
-    materialsNeeded: DataTypes.STRING,
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Please enter the course title'
+        }
+      }
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Please enter the course description'
+        }
+      }
+    },
+    estimatedTime: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isNull: {
+          msg: `Please enter an estimated time (because if you can't, we're not disposed to believe you've really organised the course terribly well)`
+        }
+      }
+    },
+    materialsNeeded: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isNull: {
+          msg: `Please indicate what materials are needed for this course (if none, please state this explicitly)`
+        }
+      }
+    },
     userId: {
       type: DataTypes.INTEGER,
       references: {
@@ -27,7 +59,12 @@ module.exports = (sequelize, DataTypes) => {
         },
         key: 'id'
       },
-      allowNull: false
+      allowNull: false,
+      validate: {
+        isNull: {
+          msg: 'The user ID for this course was not supplied to the database'
+        }
+      }
     }
   }, {
     sequelize,

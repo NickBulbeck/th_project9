@@ -10,11 +10,8 @@ const authenticateUser = require('../scripts/authenticateUser').authenticateUser
 //***********************************************************************
 // User routes:
 //***********************************************************************
-router.get('/users', authenticateUser(false), asyncHandler(async (req,res,next) => {
+router.get('/users', authenticateUser(), asyncHandler(async (req,res,next) => {
 // Returns current authorised user, whether they are standard or admin
-  if (req.currentUser) {
-    console.log(req.currentUser);
-  }
   res.status(200).json(req.currentUser);
 }));
 
@@ -39,7 +36,7 @@ router.post('/users', asyncHandler(async (req,res,next) => {
   // also return a 201 status and nae content
 }));
 
-router.put('/users', authenticateUser(false), asyncHandler(async (req,res,next) => {
+router.put('/users', authenticateUser(), asyncHandler(async (req,res,next) => {
 // updates the current authorised user, whether standard or admin
   // current authorised user only; returns 204 status with no content
 }));
@@ -72,25 +69,18 @@ router.post('/courses', asyncHandler(async (req,res,next) => {
   // Returns 201 status.
 }));
 
-router.put('/courses/:id', asyncHandler(async (req,res,next) => {
+router.put('/courses/:id', authenticateUser(), asyncHandler(async (req,res,next) => {
   // current authorised user and admin only.
   // returns 204 status.
 }));
 
-router.delete('/courses/:id', asyncHandler(async (req,res,next) => {
+router.delete('/courses/:id', authenticateUser(), asyncHandler(async (req,res,next) => {
   // admin and authorised (course-owning) user only
   // returns 204 status.
 }));
 
 
 
-
-// const setMyInfo = (text) => {
-//   return (req, res, next) => {
-//     req.myInfo = text;
-//     next();
-//   };
-// };
 
 router.get('/adminTest', authenticateUser(true), asyncHandler(async (req,res,next) => {
   res.status(200).json(req.currentUser);

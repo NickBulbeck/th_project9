@@ -1,16 +1,16 @@
+//  Middleware that either sends an "access denied" 401 response, 
+//  or the user record of an authenticated user (without password or metadata).
+//  Username and password are checked via bcrypt.
+//  Takes an optional boolean argument - if this is set to "true", the user will
+//  only be authenticated if their role is "admin".
+//  
+
 const auth = require('basic-auth');
 const User = require('../models').Users;
 const bcrypt = require('bcrypt');
 let message;
 
-// const setMyInfo = (text) => {
-//   return (req, res, next) => {
-//     req.myInfo = text;
-//     next();
-//   };
-// };
-
-const authenticateUser = (mustBeAdmin) => {
+const authenticateUser = (mustBeAdmin=false) => {
   return async (req,res,next) => {
     const credentials = auth(req);
     console.log(credentials);

@@ -8,12 +8,11 @@
 const auth = require('basic-auth');
 const User = require('../models').Users;
 const bcrypt = require('bcrypt');
-let message;
 
 const authenticateUser = (mustBeAdmin=false) => {
   return async (req,res,next) => {
+    let message;
     const credentials = auth(req);
-    console.log(credentials);
     if (credentials) {
       const user = await User.findOne({
         where: {
@@ -28,9 +27,9 @@ const authenticateUser = (mustBeAdmin=false) => {
       });
       if (user) {
         const authenticated = bcrypt
-          .compareSync(credentials.pass, user.password);
+          .compareSync(credentials.pass, user.dataValues.password);
         if (authenticated) {
-          const isAdmin = user.role === "admin";
+          const isAdmin = user.dataValues.role === "admin";
           if (mustBeAdmin && !isAdmin) {
             message = `Insufficient privileges: ${user.emailAddress}`;
           } 

@@ -41,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        isNull: {
+        notNull: {
           msg: `Please enter an estimated time (because if you can't, we're not disposed to believe you've really organised the course terribly well)`
         }
       }
@@ -50,7 +50,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        isNull: {
+        notNull: {
           msg: `Please indicate what materials are needed for this course (if none, please state this explicitly)`
         }
       }
@@ -64,12 +64,6 @@ module.exports = (sequelize, DataTypes) => {
         },
         key: 'id'
       },
-      allowNull: false,
-      validate: {
-        isNull: {
-          msg: 'The user ID for this course was not supplied to the database'
-        }
-      }
     }
   }, {
     sequelize,

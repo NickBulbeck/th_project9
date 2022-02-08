@@ -35,7 +35,7 @@ router.post('/users', asyncHandler(async (req,res,next) => {
   req.body.role = "standard"; // belt and braces - can't create an unauthorised admin 
   try {
     await users.create(req.body);
-    res.status(201).end();
+    res.status(201).location('/').end();
   } catch(error) {
     if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
       const errors = error.errors.map(err => err.message);
@@ -147,22 +147,142 @@ router.delete('/users/:id', authenticateUser(true), asyncHandler(async (req,res,
 //***********************************************************************
 
 router.get('/courses', asyncHandler(async (req,res,next) => {
-  // gets them a'. Returns 200 status. No authorisation needed.
+  // gets them a'. Returns 200 status. No authorisation needed. Include the user, BTW.
+  const allCourses = {};
+  allCourses.courses = await courses.findAll({
+    attributes: {
+      exclude:  [ 
+                  "createdAt",
+                  "updatedAt"
+                ]
+    }
+  });
+  for (let i=0; i < allCourses.courses.length; i++) {
+    const courseUser = await users.findOne({
+      where: {
+        id: allCourses.courses[i].userId
+      },
+      attributes: {
+        exclude:  [ 
+                    "createdAt",
+                    "updatedAt",
+                    "password",
+                    "role",
+                    "id"
+                  ] // Decided to keep the email address.
+      }
+    });
+    delete allCourses.courses[i].dataValues.userId;
+    if (courseUser) {
+      allCourses.courses[i].dataValues.user = courseUser.dataValues;
+    } else { // belt and braces - this shouldn't happen in practice
+      allCourses.courses[i].dataValues.user = "No user found for this course";
+    }
+  }
+  res.status(200).json(allCourses);
 }));
 
 router.get('/courses/:id', asyncHandler(async (req,res,next) => {
   // no authorisation needed. Returns 200 status.
+  const id = req.params.id;
+  const course = await courses.findByPk(id,{
+    attributes: {
+      exclude:  [ 
+                  "createdAt",
+                  "updatedAt"
+                ]
+    }
+  });
+  if (!course) {
+    res.status(404).json({"message":"Course not found"}); 
+  }
+  const courseUser = await users.findOne({
+    where: {
+      id: course.dataValues.userId
+    },
+    attributes: {
+      exclude:  [ 
+        "createdAt",
+        "updatedAt",
+        "password",
+        "role",
+        "id"
+      ]
+    }
+  });
+  delete course.dataValues.userId;
+  if (courseUser) {
+    course.dataValues.user = courseUser.dataValues;
+  } else {
+    course.dataValues.user = "No user found for this course";
+  }
+  res.status(200).json(course);
+  //      res.status(500).json({"Evil data prevented the server from fulfilling this request"});
+
 }));
 
-router.post('/courses', asyncHandler(async (req,res,next) => {
-  // inclined to make this admin only, but that't not in the spec
-  // Except the user will be the current authorised, and we'll need one for an admin user
-  // Returns 201 status.
+router.post('/courses', authenticateUser(), asyncHandler(async (req,res,next) => {
+  const newCourse = req.body;
+  newCourse.userId = req.currentUser.id;
+  try {
+    await courses.create(newCourse);
+    res.status(201).location('/').end();
+  } catch(error) {
+    if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+      const errors = error.errors.map(err => err.message);
+      res.status(400).json({errors});
+    } else {
+      console.log(error);
+      next(error);
+    }
+  }
 }));
 
 router.put('/courses/:id', authenticateUser(), asyncHandler(async (req,res,next) => {
-  // current authorised user and admin only.
-  // returns 204 status.
+  const id = parseInt(req.params.id);
+  const courseToUpdate = await courses.findByPk(id);
+  if (!courseToUpdate) {
+    const error = new Error("Course not found");
+    error.status = 404;
+    next(error);
+  }
+  // Can only update your own courses UNLESS you are an admin user
+  if (courseToUpdate.dataValues.userId !== req.currentUser.id && req.currentUser.role !== "admin") {
+    console.log("Rejected PUT request: user is neither the course owner nor an admin user");
+    res.status(400).json({"message":"Access denied"}).end();
+  }
+  // Cannot change the course's userId UNLESS you are an admin user
+  if (req.body.userId !== req.currentUser.id && req.currentUser.role !== "admin") {
+    console.log("Rejected PUT request: unauthorised attempt to re-assign course to different user");
+    res.status(400).json({"message":"Access denied"}).end();
+  }
+  // Cannot assign the course to a non-existent user no matter how admin you are
+  if (req.body.userId !== req.currentUser.id && req.currentUser.role === "admin") {
+    try {
+      const userExists = await users.findOne({where: {id: req.body.userId}})
+    } catch {
+      console.log("Rejected PUT request: attempt to assign course to non-existent user");
+      res.status(400).json({"message":"No such user."}).end();
+    }
+  }
+  // Ensure any empty properties in req.body are left unchanged
+  for (property in courseToUpdate) {
+    if (!req.body[property]) {
+      req.body[property] = property;
+    }
+  }
+  try {
+    await existingRecord.update(req.body);
+    res.status(204).end();
+  } catch(error) {
+    if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+      const errors = error.errors.map(err => err.message);
+      res.status(400).json({errors});
+    } else {
+      console.log(error);
+      next(error);
+    }
+  }
 }));
 
 router.delete('/courses/:id', authenticateUser(), asyncHandler(async (req,res,next) => {

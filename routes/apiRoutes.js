@@ -241,47 +241,51 @@ router.post('/courses', authenticateUser(), asyncHandler(async (req,res,next) =>
 router.put('/courses/:id', authenticateUser(), asyncHandler(async (req,res,next) => {
   const id = parseInt(req.params.id);
   const courseToUpdate = await courses.findByPk(id);
+  const adminUser = req.currentUser.role === "admin";
+  const owner = courseToUpdate.dataValues.userId === req.currentUser.id;
+  const changingOwner = req.body.userId !== req.currentUser.id;
+  let message;
   if (!courseToUpdate) {
-    const error = new Error("Course not found");
-    error.status = 404;
-    next(error);
-  }
+    console.log("Rejected PUT request: course not found");
+    message = "Course not found";
+  } else if (!owner && !adminUser) {
   // Can only update your own courses UNLESS you are an admin user
-  if (courseToUpdate.dataValues.userId !== req.currentUser.id && req.currentUser.role !== "admin") {
     console.log("Rejected PUT request: user is neither the course owner nor an admin user");
-    res.status(400).json({"message":"Access denied"}).end();
-  }
+    message = "Access denied";
+  } else if (changingOwner && !admin) {
   // Cannot change the course's userId UNLESS you are an admin user
-  if (req.body.userId !== req.currentUser.id && req.currentUser.role !== "admin") {
     console.log("Rejected PUT request: unauthorised attempt to re-assign course to different user");
-    res.status(400).json({"message":"Access denied"}).end();
-  }
+    message = "Access denied";
+  } else if (changingOwner && admin) { // shouldn't need && admin - being paranoid here
   // Cannot assign the course to a non-existent user no matter how admin you are
-  if (req.body.userId !== req.currentUser.id && req.currentUser.role === "admin") {
     try {
-      const userExists = await users.findOne({where: {id: req.body.userId}})
+      const userExists = await users.findOne({where: {id: req.body.userId}});
     } catch {
       console.log("Rejected PUT request: attempt to assign course to non-existent user");
-      res.status(400).json({"message":"No such user."}).end();
+      message = "New course owner could not be found";
     }
   }
+  if (!message) {
   // Ensure any empty properties in req.body are left unchanged
-  for (property in courseToUpdate) {
-    if (!req.body[property]) {
-      req.body[property] = property;
+    for (property in courseToUpdate) {
+      if (!req.body[property]) {
+        req.body[property] = property;
+      }
     }
-  }
-  try {
-    await existingRecord.update(req.body);
-    res.status(204).end();
-  } catch(error) {
-    if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
-      const errors = error.errors.map(err => err.message);
-      res.status(400).json({errors});
-    } else {
-      console.log(error);
-      next(error);
+    try {
+      await existingRecord.update(req.body);
+      res.status(204).end();
+    } catch(error) {
+      if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+        const errors = error.errors.map(err => err.message);
+        res.status(400).json({errors});
+      } else {
+        console.log(error);
+        next(error);
+      }
     }
+  } else {
+    res.status(400).json({message: message});
   }
 }));
 

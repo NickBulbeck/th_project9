@@ -39,21 +39,23 @@ module.exports = (sequelize, DataTypes) => {
     },
     estimatedTime: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: `Please enter an estimated time (because if you can't, we're not disposed to believe you've really organised the course terribly well)`
-        }
-      }
+      allowNull: true,
+      defaultValue: "Nobody knows..."
+      // validate: {
+      //   notNull: {
+      //     msg: `Please enter an estimated time (because if you can't, we're not disposed to believe you've really organised the course terribly well)`
+      //   }
+      // }
     },
     materialsNeeded: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: `Please indicate what materials are needed for this course (if none, please state this explicitly)`
-        }
-      }
+      allowNull: true,
+      defaultValue: "No materials needed"
+      // validate: {
+      //   notNull: {
+      //     msg: `Please indicate what materials are needed for this course (if none, please state this explicitly)`
+      //   }
+      // }
     },
     userId: {
       type: DataTypes.INTEGER,

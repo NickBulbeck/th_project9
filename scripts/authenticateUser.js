@@ -12,6 +12,7 @@ const bcrypt = require('bcrypt');
 const authenticateUser = (mustBeAdmin=false) => {
   return async (req,res,next) => {
     let message;
+    let status;
     const credentials = auth(req);
     if (credentials) {
       const user = await User.findOne({
@@ -31,24 +32,31 @@ const authenticateUser = (mustBeAdmin=false) => {
         if (authenticated) {
           const isAdmin = user.dataValues.role === "admin";
           if (mustBeAdmin && !isAdmin) {
-            message = `Insufficient privileges: ${user.emailAddress}`;
+            console.warn(`Insufficient privileges: ${user.emailAddress}`);
+            message = "Forbidden";
+            status = 403;
           } 
-          console.log(`Authentication successful for ${user.emailAddress}`);
+          console.warn(`Authentication successful for ${user.emailAddress}`);
           delete user.dataValues.password; // NOW we can horse the password.
           req.currentUser = user.dataValues;
         } else {
-          message = `Authentication failed for ${user.emailAddress}`;
+          console.warn(`Authentication failed for ${user.emailAddress}`);
+          message = "Access denied";
+          status = 401;
         }
       } else {
-        message = `User not found for ${credentials.name}`;
+        console.warn(`User not found for ${credentials.name}`);
+        message = "Access denied";
+        status = 401;
       }
     } else {
-      message = 'Auth header not found';
+      console.warn('Auth header not found')
+      message = "Access denied";
+      status = 401
     }
   // Finally...
     if (message) {
-      console.warn(message);
-      res.status(401).json({message: `Access Denied`});
+      res.status(status).json({message: message});
     } else {
       next();
     }

@@ -46,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
         isEmail: {
           msg: "This does not look like a valid email address to us."
           // may need to use /^[^@]+@[a-z]+(\.[a-z]+)+$/i if .co.uk gets bounced.
+          // so far, so good, though.
         }
       }
     },

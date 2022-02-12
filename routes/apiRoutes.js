@@ -212,20 +212,19 @@ router.get('/courses/:id', asyncHandler(async (req,res,next) => {
   delete course.dataValues.userId;
   if (courseUser) {
     course.dataValues.user = courseUser.dataValues;
-  } else {
+  } else { // belt and braces as this should be impossible:
     course.dataValues.user = "No user found for this course";
   }
   res.status(200).json(course);
-  //      res.status(500).json({"Evil data prevented the server from fulfilling this request"});
-
 }));
 
 router.post('/courses', authenticateUser(), asyncHandler(async (req,res,next) => {
-  const newCourse = req.body;
+  let newCourse = req.body; // `let` because we're updating it in the `try`-block
   newCourse.userId = req.currentUser.id;
   try {
-    await courses.create(newCourse);
-    res.status(201).location('/').end();
+    newCourse = await courses.create(newCourse);
+    const id = newCourse.dataValues.id;
+    res.status(201).location(`/api/courses/${id}`).end();
   } catch(error) {
     if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
       const errors = error.errors.map(err => err.message);
@@ -247,24 +246,28 @@ router.put('/courses/:id', authenticateUser(), asyncHandler(async (req,res,next)
   if (courseToUpdate) {
     owner = courseToUpdate.dataValues.userId === req.currentUser.id;
   }
-  let message;
+  let message, status;
   if (!courseToUpdate) {
     console.log("Rejected PUT request: course not found");
     message = "Course not found";
+    status = 400;
   } else if (!owner && !adminUser) {
   // Can only update your own courses UNLESS you are an admin user
     console.log("Rejected PUT request: user is neither the course owner nor an admin user");
-    message = "Access denied";
+    message = "Forbidden";
+    status = 403;
   } else if (changingOwner && !adminUser) {
   // Cannot change the course's userId UNLESS you are an admin user
     console.log("Rejected PUT request: unauthorised attempt to re-assign course to different user");
-    message = "Access denied";
+    message = "Forbidden";
+    status = 403;
   } else if (changingOwner && adminUser) { // shouldn't need && admin - being paranoid here
   // Cannot assign the course to a non-existent user no matter how admin you are
       const userExists = await users.findOne({where: {id: req.body.userId}});
       if (!userExists) {
         console.log("Rejected PUT request: attempt to assign course to non-existent user");
         message = "New course owner could not be found";
+        status = 400;
       }
   }
   if (!message) {
@@ -287,7 +290,7 @@ router.put('/courses/:id', authenticateUser(), asyncHandler(async (req,res,next)
       }
     }
   } else {
-    res.status(400).json({message: message});
+    res.status(status).json({message: message});
   }
 }));
 
@@ -296,7 +299,6 @@ router.delete('/courses/:id', authenticateUser(), asyncHandler(async (req,res,ne
   const id = parseInt(req.params.id);
   const adminUser = req.currentUser.role === "admin";
   const doomedCourse = await courses.findByPk(id);
-  let message;
   let courseOwner = false;
   if (doomedCourse) {
     if (doomedCourse.dataValues.userId === id) {
@@ -314,19 +316,11 @@ router.delete('/courses/:id', authenticateUser(), asyncHandler(async (req,res,ne
     }
   } else if (!authorised) {
     console.log("Unauthorised attempt to delete a course");
-    res.status(400).json({"message": "access denied"});
+    res.status(403).json({"message": "Forbidden"});
   } else if (!doomedCourse) {
     console.log("Attempt to delete a non-existent course");
-    res.status(404).json({"message": "Course not found"});
+    res.status(400).json({"message": "Course not found"});
   }
 }));
-
-
-
-
-router.get('/adminTest', authenticateUser(true), asyncHandler(async (req,res,next) => {
-  res.status(200).json(req.currentUser);
-}));
-
 
 module.exports = router;

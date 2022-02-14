@@ -1,22 +1,23 @@
 {
 	"info": {
-		"_postman_id": "5d141af3-850c-402a-8562-e33d0e57bed9",
+		"_postman_id": "4d7fa84b-cd33-4387-a821-b20dd4cd5ab3",
 		"name": "FSJS Techdegree: REST API Project",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "Get Users (With Auth)",
-      "event": [
+			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"// A comment...",
+							"// Status should be 200",
+							"// Response should have id, firstName, lastName, emailAddress, role, and nothing else",
 							"pm.test(\"Status test\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
-              "",
+							"",
 							"const jsonData = pm.response.json();",
 							"pm.test(\"Test data in the response\", () => {",
 							"  pm.expect(jsonData).to.be.an(\"object\");",
@@ -69,6 +70,31 @@
 		},
 		{
 			"name": "Create User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// response status should be 201",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"// Should have an empty response",
+							"// console.log(pm.response.code);",
+							"const body = pm.response.body;",
+							"pm.test(\"Test for empty response\", function () {",
+							"    pm.expect(body).to.equal(undefined);",
+							"});",
+							"// response should have a location header set to '/'",
+							"pm.test(\"Test for location header\", function () {",
+							"    pm.response.to.have.header(\"Location\");",
+							"    pm.response.to.be.header(\"Location\", \"/\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -79,7 +105,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"emailAddress\": \"john23@smith.com\",\n  \"password\": \"password\"\n}"
+					"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"emailAddress\": \"john23@smith.com\",\n  \"password\": \"johnpassword\"\n}"
 				},
 				"url": {
 					"raw": "http://localhost:5000/api/users",
@@ -98,6 +124,18 @@
 		},
 		{
 			"name": "Create User (Existing Email Address) - EXCEEDS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Should get a 400 response",
+							"// Response should contain an error message "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -127,6 +165,20 @@
 		},
 		{
 			"name": "Get Courses",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Should return a 200 status",
+							"// Should return an array of objects",
+							"// Each object should have the course properties, and the \"user\" property should be a nobject",
+							"// No course should have a createdAt or updatedAt property"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -151,6 +203,19 @@
 		},
 		{
 			"name": "Get Course",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Should return a status 200",
+							"// Course should contain the usual properties",
+							"// Don't test any further because there's no authorisation and we dinnae ken the user"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -175,7 +240,80 @@
 			"response": []
 		},
 		{
+			"name": "Get Course (non-existent) NICK_EXTRA",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Should return a status 404",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"// Should return an error",
+							"const jsonData = pm.response.json();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(jsonData.message).to.be.a(\"string\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:5000/api/courses/x",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"courses",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Create Course (Minimum Data)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// response status should be 201",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"// Should have an empty response",
+							"const body = pm.response.body;",
+							"pm.test(\"Test for empty response\", function () {",
+							"    pm.expect(body).to.equal(undefined);",
+							"});",
+							"// response should have a location header set to '/api/courses/xxx'",
+							"let location = pm.response.headers.get(\"Location\");",
+							"",
+							"pm.test(\"Test for location header\", function () {",
+							"    pm.response.to.have.header(\"Location\");",
+							"    // pm.response.to.be.header(\"Location\", \"/api/courses/\");",
+							"    pm.expect(location).to.match(/^a-z$/);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "basic",
@@ -219,6 +357,18 @@
 		},
 		{
 			"name": "Update Course (Minimum Data)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Returns a 204",
+							"// Returns nothing else"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "basic",
@@ -263,6 +413,18 @@
 		},
 		{
 			"name": "Delete Course (With Auth)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Returns a 204",
+							"// Returns nothing else"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "basic",
@@ -303,6 +465,18 @@
 		},
 		{
 			"name": "Update Course (Not Owner) - EXCEEDS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Returns a 403 (forbidden) code",
+							"// Returns the error \"forbidden\""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "basic",
@@ -347,6 +521,18 @@
 		},
 		{
 			"name": "Delete Course (Not Owner) - EXCEEDS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Returns a 403 status",
+							"// Returns the error \"forbidden\""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "basic",
@@ -387,6 +573,18 @@
 		},
 		{
 			"name": "Create User (Incomplete Data)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Should return a status of 400",
+							"// Should return 4 errors"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -416,6 +614,18 @@
 		},
 		{
 			"name": "Create Course (Incomplete Data)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Should return a status of 400",
+							"// Shouuld return two errors"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "basic",
@@ -459,6 +669,27 @@
 		},
 		{
 			"name": "Update Course (Incomplete Data)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Should return a 400 status",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Should return two errors",
+							"const jsonData = pm.response.json();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(jsonData.errors).to.be.an(\"array\");",
+							"});",
+							"// Should return 2 error messages"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "basic",
@@ -505,6 +736,26 @@
 		},
 		{
 			"name": "Create User (Invalid Email Address) - EXCEEDS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Should return a 400 status",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Should return a single error",
+							"const jsonData = pm.response.json();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(jsonData.errors).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -534,6 +785,27 @@
 		},
 		{
 			"name": "Get Users (No Auth)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Should return a 401 status",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"// Should return an 'access denied' error",
+							"const jsonData = pm.response.json();",
+							"const message = jsonData.message.toLowerCase();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(message).to.equal(\"access denied\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -554,6 +826,27 @@
 		},
 		{
 			"name": "Create Course (No Auth, Incomplete Data)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Should return a 401 status",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"// Should return an 'access denied' error",
+							"const jsonData = pm.response.json();",
+							"const message = jsonData.message.toLowerCase();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(message).to.equal(\"access denied\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -582,6 +875,27 @@
 		},
 		{
 			"name": "Update Course (No Auth, Incomplete Data)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Should return a 401 status",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"// Should return an 'access denied' error",
+							"const jsonData = pm.response.json();",
+							"const message = jsonData.message.toLowerCase();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(message).to.equal(\"access denied\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "PUT",
 				"header": [
@@ -613,6 +927,27 @@
 		},
 		{
 			"name": "Delete Course (No Auth)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Should return a 401 status",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"// Should return an 'access denied' error",
+							"const jsonData = pm.response.json();",
+							"const message = jsonData.message.toLowerCase();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(message).to.equal(\"access denied\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "noauth"

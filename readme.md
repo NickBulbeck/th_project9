@@ -1,33 +1,22 @@
-Beginning of Project 9!
+Greetings from Scotland!
 
-IMMEDIATE TASK (<= 3 steps in here...>)
-1)  Re-discover what "currently authenticated User" means.
-2)  Check out the users/get routes in the unit 9 coursework.
-3)  Check out the users/post routes likewise.
+Welcome to this exciting TreeHouse Fullstack JavaScript Tech Degree Unit 9 Project. I hope
+you have at least 30% as much fun reviewing it as I did writing it; though even 20% would
+still be a significant quantity of fun.
 
-LEARNING NOTES
- - There must be a difference between unauthorised and logged-in requests
- - We GET all users using /users, but we GET the current user using /users/n
- - We POST to /courses or /users, not to /courses/1 or /users/2
- - We PUT to /courses/1 or /users/2
- - We could DELETE /users in principle, but in practice we'll only DELETE /users/n
- - /url/endpoing.json?key=value is a url + query (or query string)
- - HTTP has a defined set of keys for request headers which contain key/value pairs
- - Sam wants to upgrade to a new version of /facebook/api/v, btw.
- - Requests and responses both have headers.
- - There are hunners of status codes, which have standardised meanings.
- - Cacheing isn't really part of Unit 9, but there are standard cacheing tools.
- - Rate-limiting likewise.
- - res.json() converts an **object** to json.
- - for PUT requests, it's customary to send a 204 status and nothing else
- - for DELETE requests, use res.status(204).end();
- - create an object with "errors" : ["error","error"] and res.json({errors}) it
- - consider returning user and developer versions of each error
- - consider the built-in express-validator library
+NOTES ON TESTING THE PROJECT
+I've installed newman, the POSTMAN cli tool, as a dev-dependency. This means that you can
+run the test file RESTAPI.postman_collection.json by entering "npm test" (I've add a "test"
+script to package.json for this).
 
-
-ANSWERS SO FAR...
- - a blank database with no models or metadata can be created in the command line.
- - then, you can set up models entirely within the app, and sync() creates if not exists
- - though, obviously, they don't have data in them at that point.
-
+I've also added a bit of functionality, especially in the shape of a "role" attribute for the
+user model. This can be either "standard" or "admin", with admin users able to access a
+number of extra functions:
+ - Viewing all the courses together
+ - Viewing, editing and deleting courses they don't own
+ - Deleting users
+ - Editing user records other than their own
+ - Assigning courses between users
+ To support this, I've included an enhanced authenticateUser.js file, which takes a boolean
+ argument to indicate whether it needs to authenticate only admin users. (This argument 
+ defaults to "false", meaning that it will authenticate both admin and standard users.)

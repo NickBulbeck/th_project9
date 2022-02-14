@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "Get Users (With Auth)",
+			"name": "Tested: Get Users (With Auth)",
 			"event": [
 				{
 					"listen": "test",
@@ -69,7 +69,7 @@
 			"response": []
 		},
 		{
-			"name": "Create User",
+			"name": "Tested: Create User",
 			"event": [
 				{
 					"listen": "test",
@@ -80,7 +80,6 @@
 							"    pm.response.to.have.status(201);",
 							"});",
 							"// Should have an empty response",
-							"// console.log(pm.response.code);",
 							"const body = pm.response.body;",
 							"pm.test(\"Test for empty response\", function () {",
 							"    pm.expect(body).to.equal(undefined);",
@@ -123,14 +122,24 @@
 			"response": []
 		},
 		{
-			"name": "Create User (Existing Email Address) - EXCEEDS",
+			"name": "Tested: Create User (Existing Email Address) - EXCEEDS",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"// Should get a 400 response",
-							"// Response should contain an error message "
+							"// Should return a 400 status",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Should return one error",
+							"const jsonData = pm.response.json();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(jsonData.errors).to.be.an(\"array\");",
+							"  pm.expect(jsonData.errors.length).to.equal(1);",
+							"});",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -164,16 +173,24 @@
 			"response": []
 		},
 		{
-			"name": "Get Courses",
+			"name": "Tested: Get Courses",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"// Should return a 200 status",
-							"// Should return an array of objects",
-							"// Each object should have the course properties, and the \"user\" property should be a nobject",
-							"// No course should have a createdAt or updatedAt property"
+							"// Should return a status 200",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"// Should return an object",
+							"// The object should have a \"courses\" property containing an array",
+							"const jsonData = pm.response.json();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(jsonData.courses).to.be.an(\"array\");",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -202,15 +219,28 @@
 			"response": []
 		},
 		{
-			"name": "Get Course",
+			"name": "Tested: Get Course",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"// Should return a status 200",
-							"// Course should contain the usual properties",
-							"// Don't test any further because there's no authorisation and we dinnae ken the user"
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"// Response should have title, description, id and user object",
+							"// Response should not have createdAt or updatedAt",
+							"const jsonData = pm.response.json();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData.id).to.equal(1); // This value comes from the route itself",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(jsonData.title).to.be.a(\"string\");",
+							"  pm.expect(jsonData.description).to.be.a(\"string\");",
+							"  pm.expect(jsonData.user).to.be.an(\"object\");",
+							"  pm.expect(jsonData.createdAt).to.equal(undefined);",
+							"  pm.expect(jsonData.updatedAt).to.equal(undefined);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -240,7 +270,7 @@
 			"response": []
 		},
 		{
-			"name": "Get Course (non-existent) NICK_EXTRA",
+			"name": "Tested: Get Course (non-existent) NICK_EXTRA",
 			"event": [
 				{
 					"listen": "test",
@@ -285,7 +315,7 @@
 			"response": []
 		},
 		{
-			"name": "Create Course (Minimum Data)",
+			"name": "Tested: Create Course (Minimum Data)",
 			"event": [
 				{
 					"listen": "test",
@@ -306,7 +336,7 @@
 							"pm.test(\"Test for location header\", function () {",
 							"    pm.response.to.have.header(\"Location\");",
 							"    // pm.response.to.be.header(\"Location\", \"/api/courses/\");",
-							"    pm.expect(location).to.match(/^a-z$/);",
+							"    // pm.expect(location).to.match(/^a-z$/);",
 							"});",
 							""
 						],
@@ -356,14 +386,21 @@
 			"response": []
 		},
 		{
-			"name": "Update Course (Minimum Data)",
+			"name": "Tested: Update Course (Minimum Data)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"// Returns a 204",
-							"// Returns nothing else"
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"// Should return nothing else",
+							"const body = pm.response.body;",
+							"pm.test(\"Test for empty response\", function () {",
+							"    pm.expect(body).to.equal(undefined);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -412,14 +449,21 @@
 			"response": []
 		},
 		{
-			"name": "Delete Course (With Auth)",
+			"name": "FAILING TESTS: Delete Course (With Auth)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"// Returns a 204",
-							"// Returns nothing else"
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"// Returns nothing else",
+							"const body = pm.response.body;",
+							"pm.test(\"Test for empty response\", function () {",
+							"    pm.expect(body).to.equal(undefined);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -464,14 +508,23 @@
 			"response": []
 		},
 		{
-			"name": "Update Course (Not Owner) - EXCEEDS",
+			"name": "Tested: Update Course (Not Owner) - EXCEEDS",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"// Returns a 403 (forbidden) code",
-							"// Returns the error \"forbidden\""
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"// Returns the error \"forbidden\"",
+							"const jsonData = pm.response.json();",
+							"const message = jsonData.message.toLowerCase();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(message).to.equal(\"forbidden\");",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -520,14 +573,24 @@
 			"response": []
 		},
 		{
-			"name": "Delete Course (Not Owner) - EXCEEDS",
+			"name": "Tested: Delete Course (Not Owner) - EXCEEDS",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"// Returns a 403 status",
-							"// Returns the error \"forbidden\""
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"// Returns the error \"forbidden\"",
+							"",
+							"const jsonData = pm.response.json();",
+							"const message = jsonData.message.toLowerCase();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(message).to.equal(\"forbidden\");",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -572,14 +635,25 @@
 			"response": []
 		},
 		{
-			"name": "Create User (Incomplete Data)",
+			"name": "Tested: Create User (Incomplete Data)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"// Should return a status of 400",
-							"// Should return 4 errors"
+							"// Should return 4 errors",
+							"// Should return a 400 status",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Should return a single error",
+							"const jsonData = pm.response.json();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(jsonData.errors).to.be.an(\"array\");",
+							"  pm.expect(jsonData.errors.length).to.equal(4);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -613,14 +687,25 @@
 			"response": []
 		},
 		{
-			"name": "Create Course (Incomplete Data)",
+			"name": "Tested: Create Course (Incomplete Data)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"// Should return a status of 400",
-							"// Shouuld return two errors"
+							"// Shouuld return two errors",
+							"// Should return a 400 status",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Should return a single error",
+							"const jsonData = pm.response.json();",
+							"pm.test(\"Test data in the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(jsonData.errors).to.be.an(\"array\");",
+							"  pm.expect(jsonData.errors.length).to.equal(2);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -668,7 +753,7 @@
 			"response": []
 		},
 		{
-			"name": "Update Course (Incomplete Data)",
+			"name": "FAILING: Update Course (Incomplete Data)",
 			"event": [
 				{
 					"listen": "test",
@@ -684,7 +769,7 @@
 							"  pm.expect(jsonData).to.be.an(\"object\");",
 							"  pm.expect(jsonData.errors).to.be.an(\"array\");",
 							"});",
-							"// Should return 2 error messages"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -735,7 +820,7 @@
 			"response": []
 		},
 		{
-			"name": "Create User (Invalid Email Address) - EXCEEDS",
+			"name": "Tested: Create User (Invalid Email Address) - EXCEEDS",
 			"event": [
 				{
 					"listen": "test",
@@ -784,7 +869,7 @@
 			"response": []
 		},
 		{
-			"name": "Get Users (No Auth)",
+			"name": "Tested: Get Users (No Auth)",
 			"event": [
 				{
 					"listen": "test",
@@ -825,7 +910,7 @@
 			"response": []
 		},
 		{
-			"name": "Create Course (No Auth, Incomplete Data)",
+			"name": "Tested: Create Course (No Auth, Incomplete Data)",
 			"event": [
 				{
 					"listen": "test",
@@ -874,7 +959,7 @@
 			"response": []
 		},
 		{
-			"name": "Update Course (No Auth, Incomplete Data)",
+			"name": "Tested: Update Course (No Auth, Incomplete Data)",
 			"event": [
 				{
 					"listen": "test",
@@ -926,7 +1011,7 @@
 			"response": []
 		},
 		{
-			"name": "Delete Course (No Auth)",
+			"name": "Tested: Delete Course (No Auth)",
 			"event": [
 				{
 					"listen": "test",

@@ -8,3 +8,12 @@ Potential refactors:
 Friday:
 1) Find docs on pm.response: what does pm.response.json() do, and what input does it use?
 2) That is, why does the global error handler not add anything to pm.response.json() when there's a response body visible in Postman?
+
+Saturday:
+1) Do the following tests:
+ - users GET user/:id
+ - users GET all
+ - users PUT user/:id
+ - users DELETE user/:id
+ - courses PUT non-owner with auth
+ - courses DELETE non-owner with auth

@@ -24,8 +24,13 @@ app.get('/', (req, res) => {
 });
 
 // You know, the actual stuff
-const apiRouter = require('./routes/apiRoutes.js');
-app.use('/api',apiRouter);
+// const apiRouter = require('./routes/apiRoutes.js');
+// app.use('/api',apiRouter);
+
+const apiUserRouter = require('./routes/apiUserRoutes.js');
+app.use('/api/users',apiUserRouter);
+const apiCourseRouter = require('./routes/apiCourseRoutes.js');
+app.use('/api/courses',apiCourseRouter);
 
 // send 404 if no other route matched
 app.use((req, res) => {

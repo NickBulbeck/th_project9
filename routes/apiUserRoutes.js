@@ -3,7 +3,6 @@ const router = express.Router();
 
 const asyncHandler = require('../scripts/asyncHandler.js').asyncHandler;
 const users = require('../models').Users;
-const courses = require('../models').Courses;
 const authenticateUser = require('../scripts/authenticateUser').authenticateUser;
 
 //***********************************************************************
@@ -32,7 +31,36 @@ router.get('/all', authenticateUser(true), asyncHandler(async (req,res,next) => 
 
 router.get('/:id', authenticateUser(true), asyncHandler(async (req,res,next) => {
   // Returns single user; admin users only
-  res.status(200).json({"message": "Route still to be written..."});
+  // Check that :id is numeric.
+  const id = parseInt(req.params.id);
+  if (!id) {
+    const error = new Error("Invalid user id");
+    error.status = 400;
+    console.log(`Attempt to get data for user id '${req.params.id}'`);
+    throw(error);
+  }
+  let user = null;
+  try {
+    user = await users.findOne({
+      where: {
+        id: id
+      },
+      attributes: {
+          exclude:  [ "password",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+      }
+    })
+  } catch(error) {
+    console.log(`Error trying to find user id ${id}`);
+    throw(error);
+  }
+  if (!user) {
+    res.status(404).json({message: `User ${req.params.id} not found`});
+  } else {
+    res.status(200).json(user);
+  }
 }));
 
 

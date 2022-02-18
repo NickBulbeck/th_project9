@@ -17,4 +17,4 @@ Saturday:
  - users DELETE user/:id                DONE
  - courses PUT non-owner with auth      DONE
  - courses DELETE non-owner with auth   DONE
- 2) Complete the GET users/id route     todo
+ 2) Complete the GET users/id route     DONE

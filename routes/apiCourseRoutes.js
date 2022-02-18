@@ -168,8 +168,7 @@ router.delete('/:id', authenticateUser(), asyncHandler(async (req,res,next) => {
   let doomedCourse = null;
   try {
     doomedCourse = await courses.findByPk(id);
-  } catch { // We'll come here if id is NaN
-    const error = new Error;
+  } catch(error) { // We'll come here if id is NaN
     error.status = 500;
     error.message = "A database error occurred when attempting to delete this course";
     error.id = id || req.params.id;

@@ -11,9 +11,10 @@ Friday:
 
 Saturday:
 1) Do the following tests:
- - users GET user/:id
- - users GET all
- - users PUT user/:id
- - users DELETE user/:id
- - courses PUT non-owner with auth
- - courses DELETE non-owner with auth
+ - users GET user/:id                   DONE
+ - users GET all                        DONE 
+ - users PUT user/:id                   DONE
+ - users DELETE user/:id                DONE
+ - courses PUT non-owner with auth      DONE
+ - courses DELETE non-owner with auth   DONE
+ 2) Complete the GET users/id route     todo

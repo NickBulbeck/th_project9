@@ -24,9 +24,6 @@ app.get('/', (req, res) => {
 });
 
 // You know, the actual stuff
-// const apiRouter = require('./routes/apiRoutes.js');
-// app.use('/api',apiRouter);
-
 const apiUserRouter = require('./routes/apiUserRoutes.js');
 app.use('/api/users',apiUserRouter);
 const apiCourseRouter = require('./routes/apiCourseRoutes.js');

@@ -284,12 +284,12 @@ router.put('/courses/:id', authenticateUser(), asyncHandler(async (req,res,next)
 // and notEmtpy validators I tried. There came a point when I just had to
 // move on. Interestingly, a google search suggests I'm not the only 
 // person to have had problems with notEmpty.
-      if (req.body.title === "" || !req.body.title) {
-        req.body.title = null;
-      };
-      if (req.body.description === "" || !req.body.description) {
-        req.body.description = null;
-      }
+      // if (req.body.title === "" || !req.body.title) {
+      //   req.body.title = null;
+      // };
+      // if (req.body.description === "" || !req.body.description) {
+      //   req.body.description = null;
+      // }
       await courseToUpdate.update(req.body);
       res.status(204).end();
     } catch(error) {
@@ -310,8 +310,6 @@ router.delete('/courses/:id', authenticateUser(), asyncHandler(async (req,res,ne
   // admin and authorised (course-owning) users only
   const id = parseInt(req.params.id);
   let doomedCourse = null;
-  let message = null;
-  let status;
   try {
     doomedCourse = await courses.findByPk(id);
   } catch { // We'll come here if id is NaN

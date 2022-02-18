@@ -1,10 +1,8 @@
 'use strict';
 const bcrypt = require('bcryptjs/dist/bcrypt');
-const {
-  Model
-} = require('sequelize');
+const Sequelize = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Users extends Model {
+  class Users extends Sequelize.Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -16,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   };
   Users.init({
     firstName: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
       validate: {
         notNull: {
@@ -25,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     lastName: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
       validate: {
         notNull: {
@@ -34,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     emailAddress: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
       unique: {
         msg: "The email you have entered is already on our system"
@@ -51,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     password: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
       validate: {
         notNull: {
@@ -72,7 +70,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     role: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       validate: {
         isIn: {
           args: [['standard','admin']],

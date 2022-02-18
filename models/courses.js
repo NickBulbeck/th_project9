@@ -1,9 +1,7 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class Courses extends Model {
+const Sequelize = require('sequelize');
+module.exports = (sequelize) => {
+  class Courses extends Sequelize.Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -15,32 +13,40 @@ module.exports = (sequelize, DataTypes) => {
   };
   Courses.init({
     id: {
-      type: DataTypes.INTEGER,
+      type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
     title: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
       notEmpty: true, // this has no effect
       validate: {
         notNull: {
           msg: 'Please enter the course title'
         },
+        notEmpty: {
+          args: true,
+          msg: "Course title cannot be blank"
+        }
       }
     },
     description: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
       notEmpty: true, // this has no effect
       validate: {
         notNull: {
           msg: 'Please enter the course description'
         },
+        notEmpty: {
+          args: true,
+          msg: "Course description cannot be blank"
+        }
       }
     },
     estimatedTime: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: true,
       defaultValue: "Nobody knows..."
       // validate: {
@@ -50,7 +56,7 @@ module.exports = (sequelize, DataTypes) => {
       // }
     },
     materialsNeeded: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: true,
       defaultValue: "No materials needed"
       // validate: {
@@ -60,7 +66,7 @@ module.exports = (sequelize, DataTypes) => {
       // }
     },
     userId: {
-      type: DataTypes.INTEGER,
+      type: Sequelize.INTEGER,
       references: {
         model: {
           tableName: 'users',

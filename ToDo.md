@@ -6,6 +6,5 @@ Potential refactors:
 5) Tidy up the readme.md file
 
 Friday:
-1) Download starter files and make sure my seed files match up with the originals
-2) Thence make sure all the given tests produce expected results
-3) Thence maybe add some more that test my own additions
+1) Find docs on pm.response: what does pm.response.json() do, and what input does it use?
+2) That is, why does the global error handler not add anything to pm.response.json() when there's a response body visible in Postman?

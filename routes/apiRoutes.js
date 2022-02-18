@@ -273,12 +273,23 @@ router.put('/courses/:id', authenticateUser(), asyncHandler(async (req,res,next)
   }
   if (!message) {
   // Ensure any empty properties in req.body are left unchanged
-    for (property in courseToUpdate) {
-      if (!req.body[property]) {
-        req.body[property] = property;
-      }
-    }
+    // for (property in courseToUpdate) {  // COMMENTED OUT FOR THE NOO - I'D PREFER TO
+    //   if (!req.body[property]) {        // IMPLEMENT IT THIS WAY, BUT THE PROJECT 9
+    //     req.body[property] = property;  // RUBRIC REQUIRES OTHERWISE.
+    //   }
+    // }
     try {
+// This is a crude workaround for the fact that the Sequelize notEmpty
+// validation was ignoring empty strings under every combination of custom
+// and notEmtpy validators I tried. There came a point when I just had to
+// move on. Interestingly, a google search suggests I'm not the only 
+// person to have had problems with notEmpty.
+      if (req.body.title === "" || !req.body.title) {
+        req.body.title = null;
+      };
+      if (req.body.description === "" || !req.body.description) {
+        req.body.description = null;
+      }
       await courseToUpdate.update(req.body);
       res.status(204).end();
     } catch(error) {
@@ -298,16 +309,37 @@ router.put('/courses/:id', authenticateUser(), asyncHandler(async (req,res,next)
 router.delete('/courses/:id', authenticateUser(), asyncHandler(async (req,res,next) => {
   // admin and authorised (course-owning) users only
   const id = parseInt(req.params.id);
+  let doomedCourse = null;
+  let message = null;
+  let status;
+  try {
+    doomedCourse = await courses.findByPk(id);
+  } catch { // We'll come here if id is NaN
+    const error = new Error;
+    error.status = 500;
+    error.message = "A database error occurred when attempting to delete this course";
+    error.id = id || req.params.id;
+    console.log(`Error - attempt to delete course id '${error.id}'`);
+    throw error;
+  }
+  if (!doomedCourse) {
+    const error = new Error;
+    error.status = 404;
+    error.message = "Course not found";
+    console.log(`Not found - attempt to delete course id ${req.params.id}`);
+    throw error;
+  }
+  // doomedCourse exists; so now, just need to check whether the current user is authorised.
+  const currentUser = req.currentUser.id;
   const adminUser = req.currentUser.role === "admin";
-  const doomedCourse = await courses.findByPk(id);
   let courseOwner = false;
   if (doomedCourse) {
-    if (doomedCourse.dataValues.userId === id) {
+    if (doomedCourse.dataValues.userId === currentUser) {
       courseOwner = true;
     }
   }
   const authorised = adminUser || courseOwner;
-  if (doomedCourse && authorised) {
+  if (authorised) {
     try {
       doomedCourse.destroy();
       res.status(204).end();
@@ -315,13 +347,10 @@ router.delete('/courses/:id', authenticateUser(), asyncHandler(async (req,res,ne
       console.log("Failed to delete course");
       next(error);
     }
-  } else if (!authorised) {
+  } else {
     console.log("Unauthorised attempt to delete a course");
     res.status(403).json({"message": "Forbidden"});
-  } else if (!doomedCourse) {
-    console.log("Attempt to delete a non-existent course");
-    res.status(400).json({"message": "Course not found"});
-  }
+  } 
 }));
 
 module.exports = router;

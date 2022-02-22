@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon ./app.js",
     "seed": "cross-env DB_ENABLE_LOGGING=true node './seed'",
-    "test": "newman run RESTAPI-NICK_TESTS.postman_collection.json"
+    "test": "npm run seed; npm start & newman run RESTAPI-NICK_TESTS.postman_collection.json"
   },
   "keywords": [],
   "author": "",

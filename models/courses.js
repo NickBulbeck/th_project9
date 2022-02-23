@@ -32,7 +32,7 @@ module.exports = (sequelize) => {
       }
     },
     description: {
-      type: Sequelize.STRING,
+      type: Sequelize.TEXT,
       allowNull: false,
       notEmpty: true, // this has no effect
       validate: {
